@@ -82,7 +82,7 @@ body.marine .card-name{color:#000;}
 .close-btn{position:absolute;top:12px;right:16px;font-size:28px;font-weight:bold;cursor:pointer;z-index:10;}
 
 /* Modal body scroll together on mobile */
-.modal-body{display:flex;flex-direction:row;max-height:70vh;overflow:hidden;}
+.modal-body{display:flex;flex-direction:row;max-height:70vh;overflow:hidden;touch-action:pan-y;}
 .modal-picture{flex:1;display:flex;justify-content:center;align-items:center;padding:16px;}
 .modal-picture img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;}
 .modal-details{flex:1;padding:16px;font-size:14px;line-height:1.5;}
@@ -229,6 +229,7 @@ const cards = [
 {"code":"Don-Card-Vivi","name":"Nefeltari Vivi","rarity":"Rare","border":"black","price":3.00,"description":"Standard black-border DON!! card; Your Turn +1000 effect to boost your characters.","set":"DON","image":"images/Don-Card-Vivi.jpg"},
 {"code":"Don-Card-Boa-Hancock","name":"Boa Hancock","rarity":"Rare","border":"black","price":4.00,"description":"Standard black-border DON!! card; Your Turn +1000 effect. Alternate art or foil can be much higher.","set":"DON","image":"images/Don-Card-Boa-Hancock.jpg"}
 ];
+
 // ===== PAGE SWITCHING =====
 function showCollection(){document.getElementById("home-page").style.display="none";document.getElementById("collection-page").style.display="block";localStorage.setItem('lastPage','collection');}
 function showHome(){document.getElementById("collection-page").style.display="none";document.getElementById("home-page").style.display="block";localStorage.setItem('lastPage','home');}
@@ -314,6 +315,7 @@ function openModal(index){
   `;
   modal.style.display="flex"; setTimeout(()=>modal.style.opacity=1,50);
 }
+
 function prevCard(){currentIndex=(currentIndex-1+cards.length)%cards.length; openModal(currentIndex);}
 function nextCard(){currentIndex=(currentIndex+1)%cards.length; openModal(currentIndex);}
 function openRandomCard(){openModal(Math.floor(Math.random()*cards.length));}
@@ -322,7 +324,30 @@ function copyCardLink(){navigator.clipboard.writeText(window.location.href.split
 closeBtn.addEventListener("click",()=>{closeModal();});
 window.addEventListener("click",(e)=>{if(e.target===modal){closeModal();}});
 function closeModal(){modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);}
-document.addEventListener("keydown",e=>{if(modal.style.display==="flex"){if(e.key==="ArrowLeft") prevCard();else if(e.key==="ArrowRight") nextCard();else if(e.key==="Escape") closeModal();}});
+
+// ===== KEYBOARD NAV =====
+document.addEventListener("keydown",e=>{
+  if(modal.style.display==="flex"){
+    if(e.key==="ArrowLeft") prevCard();
+    else if(e.key==="ArrowRight") nextCard();
+    else if(e.key==="Escape") closeModal();
+  }
+});
+
+// ===== TOUCH SWIPE FOR MOBILE =====
+let startX=0, endX=0;
+const swipeThreshold=50; // pixels
+const modalBody=modal.querySelector(".modal-body");
+modalBody.addEventListener("touchstart",(e)=>{startX=e.touches[0].clientX;});
+modalBody.addEventListener("touchmove",(e)=>{endX=e.touches[0].clientX;});
+modalBody.addEventListener("touchend",()=>{
+  const diff=endX-startX;
+  if(Math.abs(diff)>swipeThreshold){
+    if(diff>0) prevCard();
+    else nextCard();
+  }
+  startX=0; endX=0;
+});
 
 // ===== SCROLL ANIMATION =====
 function animateOnScroll(){
