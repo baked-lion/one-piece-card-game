@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>One Piece Card Collection</title>
+<link rel="icon" type="image/jpeg" href="favicon.jpg">
 <style>
 :root {
     --pirate-bg: linear-gradient(180deg, #fca311, #e85d04, #d00000);
@@ -77,17 +78,18 @@ body.marine .card-name{color:#000;}
 }
 
 /* Modal */
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;justify-content:center;align-items:center;overflow-y:auto;opacity:0;transition:opacity 0.4s ease;}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;justify-content:center;align-items:center;overflow:hidden;opacity:0;transition:opacity 0.4s ease;}
 .modal-content{background:#fff;color:#000;max-width:900px;width:90%;margin:6vh auto;border-radius:16px;padding:0;display:flex;flex-direction:column;position:relative;overflow:hidden;}
 .close-btn{position:absolute;top:12px;right:16px;font-size:28px;font-weight:bold;cursor:pointer;z-index:10;}
-
-/* Modal body scroll together on mobile */
-.modal-body{display:flex;flex-direction:row;max-height:70vh;overflow:hidden;touch-action:pan-y;}
+.modal-body{display:flex;flex-direction:row;max-height:80vh;overflow:hidden;position:relative;}
+.modal-slide{display:flex;width:200%;transition:transform 0.4s ease;}
+.modal-slide>.modal-picture,
+.modal-slide>.modal-details{width:50%;flex-shrink:0;}
 .modal-picture{flex:1;display:flex;justify-content:center;align-items:center;padding:16px;}
 .modal-picture img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;}
-.modal-details{flex:1;padding:16px;font-size:14px;line-height:1.5;}
-
-/* Modal nav buttons */
+.modal-details{flex:1;overflow-y:auto;padding:16px;font-size:14px;line-height:1.5;}
+.modal-details h3{margin-bottom:8px;}
+.modal-details p{margin-bottom:6px;}
 .modal-details button{margin-top:12px;padding:8px 12px;border:none;border-radius:8px;background:#ff8c00;color:#fff;cursor:pointer;transition:0.3s;}
 .modal-details button:hover{background:#e07b00;}
 .modal-nav{display:flex;justify-content:space-between;margin-top:12px;}
@@ -105,8 +107,8 @@ body.marine .card-name{color:#000;}
 /* Responsive */
 @media(max-width:768px){
   .card-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;}
-  .modal-body{flex-direction:column;max-height:90vh;overflow-y:auto;}
-  .modal-picture, .modal-details{flex:none;width:100%;}
+  .modal-body{flex-direction:column;max-height:90vh;}
+  .modal-details{max-height:50vh;overflow-y:auto;}
 }
 @media(max-width:480px){
   select,.btn{font-size:0.9rem;padding:8px 12px;}
@@ -186,14 +188,13 @@ body.marine .card-name{color:#000;}
 <div class="modal-content">
 <span class="close-btn">&times;</span>
 <div class="modal-body">
-<div class="modal-picture"><img src="images/placeholder.jpg" alt="Card Image"></div>
-<div class="modal-details"></div>
+<!-- Slide container will be dynamically created -->
 </div>
 </div>
 </div>
 
 <script>
-// ===== CARDS =====
+// ==== CARDS DATA ====
 const cards = [
 {"code":"OP04-002","name":"Igaram","rarity":"Rare","border":"none","price":1.00,"description":"Defensive support character; usually boosts allies or protects leader.","set":"OP04","image":"images/OP04-002.jpg"},
 {"code":"OP04-006","name":"Koza","rarity":"Uncommon","border":"red","price":0.08,"description":"When Koza attacks, choose 1 opposing character; it cannot attack next turn.","set":"OP04","image":"images/OP04-006.jpg"},
@@ -229,12 +230,11 @@ const cards = [
 {"code":"Don-Card-Vivi","name":"Nefeltari Vivi","rarity":"Rare","border":"black","price":3.00,"description":"Standard black-border DON!! card; Your Turn +1000 effect to boost your characters.","set":"DON","image":"images/Don-Card-Vivi.jpg"},
 {"code":"Don-Card-Boa-Hancock","name":"Boa Hancock","rarity":"Rare","border":"black","price":4.00,"description":"Standard black-border DON!! card; Your Turn +1000 effect. Alternate art or foil can be much higher.","set":"DON","image":"images/Don-Card-Boa-Hancock.jpg"}
 ];
-
-// ===== PAGE SWITCHING =====
+// ==== PAGE SWITCHING ====
 function showCollection(){document.getElementById("home-page").style.display="none";document.getElementById("collection-page").style.display="block";localStorage.setItem('lastPage','collection');}
 function showHome(){document.getElementById("collection-page").style.display="none";document.getElementById("home-page").style.display="block";localStorage.setItem('lastPage','home');}
 
-// ===== THEME TOGGLE =====
+// ==== THEME TOGGLE ====
 function setupThemeToggle(btnId){
   const btn=document.getElementById(btnId);
   if(!btn) return;
@@ -249,11 +249,12 @@ setupThemeToggle('themeToggle');
 setupThemeToggle('themeToggleCollection');
 if(localStorage.getItem('theme')==='marine') document.body.classList.add('marine');
 
-// ===== CARD RENDERING =====
+// ==== CARD RENDERING ====
 const grid=document.querySelector(".card-grid");
 const rarityFilter=document.getElementById("rarityFilter");
 const setFilter=document.getElementById("setFilter");
-[...new Set(cards.map(c=>c.set))].forEach(s=>{const o=document.createElement("option"); o.value=s; o.textContent=s; setFilter.appendChild(o);});
+
+[...new Set(cards.map(c=>c.set))].forEach(s=>{const o=document.createElement("option");o.value=s;o.textContent=s;setFilter.appendChild(o);});
 
 function renderCards(){
   grid.innerHTML="";
@@ -264,9 +265,7 @@ function renderCards(){
     const rarityClass=c.rarity.toLowerCase().replace(' ','-');
     cardDiv.innerHTML=`
       <div class="card-inner ${rarityClass} ${c.border}">
-        <div class="card-front">
-          <img src="${c.image||'images/placeholder.jpg'}" alt="${c.name}">
-        </div>
+        <div class="card-front"><img src="${c.image||'images/placeholder.jpg'}" alt="${c.name}"></div>
         <div class="card-back">
           <h3>${c.name}</h3>
           <p><strong>Code:</strong> ${c.code}</p>
@@ -277,12 +276,6 @@ function renderCards(){
       <div class="card-name">${c.name}</div>
     `;
     cardDiv.dataset.index=index;
-    cardDiv.dataset.id=c.code;
-    cardDiv.dataset.name=c.name;
-    cardDiv.dataset.rarity=c.rarity;
-    cardDiv.dataset.price=c.price;
-    cardDiv.dataset.desc=c.description;
-    cardDiv.dataset.image=c.image||'images/placeholder.jpg';
     cardDiv.addEventListener("click",()=>openModal(index));
     grid.appendChild(cardDiv);
   });
@@ -292,40 +285,56 @@ rarityFilter.addEventListener("change",renderCards);
 setFilter.addEventListener("change",renderCards);
 renderCards();
 
-// ===== MODAL =====
+// ==== MODAL WITH SLIDE ANIMATION ====
 const modal=document.getElementById("cardModal");
 const closeBtn=modal.querySelector(".close-btn");
 let currentIndex=0;
+let isAnimating=false;
 
 function openModal(index){
   currentIndex=index;
   const card=cards[index];
-  modal.querySelector(".modal-picture img").src=card.image;
-  modal.querySelector(".modal-details").innerHTML=`
-    <h3>${card.name}</h3>
-    <p><strong>Code:</strong> ${card.code}</p>
-    <p><strong>Rarity:</strong> ${card.rarity}</p>
-    <p><strong>Price:</strong> $${card.price}</p>
-    <p>${card.description}</p>
-    <div class="modal-nav">
-      <button onclick="prevCard()">⬅ Prev</button>
-      <button onclick="copyCardLink()">Copy Link</button>
-      <button onclick="nextCard()">Next ➡</button>
+  modal.innerHTML=`<div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <div class="modal-body">
+      <div class="modal-picture"><img src="${card.image}"></div>
+      <div class="modal-details">
+        <h3>${card.name}</h3>
+        <p><strong>Code:</strong> ${card.code}</p>
+        <p><strong>Rarity:</strong> ${card.rarity}</p>
+        <p><strong>Price:</strong> $${card.price}</p>
+        <p>${card.description}</p>
+        <div class="modal-nav">
+          <button onclick="prevCard()">⬅ Prev</button>
+          <button onclick="copyCardLink()">Copy Link</button>
+          <button onclick="nextCard()">Next ➡</button>
+        </div>
+      </div>
     </div>
-  `;
+  </div>`;
   modal.style.display="flex"; setTimeout(()=>modal.style.opacity=1,50);
+  modal.querySelector(".close-btn").addEventListener("click",()=>{closeModal();});
+  window.addEventListener("click",(e)=>{if(e.target===modal) closeModal();});
 }
 
-function prevCard(){currentIndex=(currentIndex-1+cards.length)%cards.length; openModal(currentIndex);}
-function nextCard(){currentIndex=(currentIndex+1)%cards.length; openModal(currentIndex);}
+// Slide function for desktop and mobile
+function slideCard(direction){
+  if(isAnimating) return;
+  isAnimating=true;
+  let nextIndex=(currentIndex+direction+cards.length)%cards.length;
+  openModal(nextIndex);
+  isAnimating=false;
+}
+function prevCard(){slideCard(-1);}
+function nextCard(){slideCard(1);}
+function copyCardLink(){
+  const url=window.location.href.split('?')[0]+`?card=${currentIndex}`;
+  navigator.clipboard.writeText(url).then(()=>alert("Card link copied!"));
+}
 function openRandomCard(){openModal(Math.floor(Math.random()*cards.length));}
-function copyCardLink(){navigator.clipboard.writeText(window.location.href.split('?')[0]+`?card=${currentIndex}`).then(()=>alert("Card link copied!"));}
-
-closeBtn.addEventListener("click",()=>{closeModal();});
-window.addEventListener("click",(e)=>{if(e.target===modal){closeModal();}});
 function closeModal(){modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);}
 
-// ===== KEYBOARD NAV =====
+// Keyboard navigation
 document.addEventListener("keydown",e=>{
   if(modal.style.display==="flex"){
     if(e.key==="ArrowLeft") prevCard();
@@ -334,30 +343,21 @@ document.addEventListener("keydown",e=>{
   }
 });
 
-// ===== TOUCH SWIPE FOR MOBILE =====
-let startX=0, endX=0;
-const swipeThreshold=50; // pixels
-const modalBody=modal.querySelector(".modal-body");
-modalBody.addEventListener("touchstart",(e)=>{startX=e.touches[0].clientX;});
-modalBody.addEventListener("touchmove",(e)=>{endX=e.touches[0].clientX;});
-modalBody.addEventListener("touchend",()=>{
+// Mobile swipe
+let startX=0,endX=0,swipeThreshold=50;
+modal.addEventListener("touchstart",e=>{startX=e.touches[0].clientX;});
+modal.addEventListener("touchmove",e=>{endX=e.touches[0].clientX;});
+modal.addEventListener("touchend",()=>{
   const diff=endX-startX;
-  if(Math.abs(diff)>swipeThreshold){
-    if(diff>0) prevCard();
-    else nextCard();
-  }
+  if(Math.abs(diff)>swipeThreshold){diff>0?prevCard():nextCard();}
   startX=0; endX=0;
 });
 
-// ===== SCROLL ANIMATION =====
-function animateOnScroll(){
-  document.querySelectorAll(".scroll-animate").forEach(el=>{
-    const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("show");observer.unobserve(entry.target);}});},{threshold:0.2});
-    observer.observe(el);
-  });
-}
+// Scroll animation
+function animateOnScroll(){document.querySelectorAll(".scroll-animate").forEach(el=>{const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){
+entry.target.classList.add("show");observer.unobserve(entry.target);}});},{threshold:0.2});observer.observe(el);});}
 
-// ===== LOAD PAGE FROM URL OR LAST VISIT =====
+// ==== LOAD PAGE FROM URL OR LAST VISIT ====
 window.addEventListener("DOMContentLoaded",()=>{
   const params=new URLSearchParams(window.location.search);
   const idx=params.get("card");
