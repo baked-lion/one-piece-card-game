@@ -318,23 +318,18 @@ function openModal(index){
   modal.style.display="flex"; setTimeout(()=>modal.style.opacity=1,50);
 }
 
+// Copy Link
 function copyCardLink(){
   const url=window.location.href.split('?')[0]+`?card=${currentIndex}`;
   navigator.clipboard.writeText(url).then(()=>alert("Card link copied!"));
 }
 
-function prevCard(){
-  currentIndex=(currentIndex-1+cards.length)%cards.length;
-  openModal(currentIndex);
-}
-function nextCard(){
-  currentIndex=(currentIndex+1)%cards.length;
-  openModal(currentIndex);
-}
-function openRandomCard(){
-  openModal(Math.floor(Math.random()*cards.length));
-}
+// Navigation
+function prevCard(){currentIndex=(currentIndex-1+cards.length)%cards.length; openModal(currentIndex);}
+function nextCard(){currentIndex=(currentIndex+1)%cards.length; openModal(currentIndex);}
+function openRandomCard(){openModal(Math.floor(Math.random()*cards.length));}
 
+// Close modal
 closeBtn.addEventListener("click",()=>{modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);});
 window.addEventListener("click",(e)=>{if(e.target===modal){modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);}});
 
@@ -356,6 +351,27 @@ window.addEventListener("DOMContentLoaded",()=>{
     if(cards[index]) openModal(index);
     const targetCard=document.querySelector(`.card[data-index='${index}']`);
     if(targetCard) targetCard.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+});
+
+// ===== DESKTOP KEYBOARD NAVIGATION =====
+document.addEventListener("keydown",(e)=>{
+  if(modal.style.display==="flex"){
+    if(e.key==="ArrowLeft") prevCard();
+    if(e.key==="ArrowRight") nextCard();
+    if(e.key==="Escape") {modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);}
+  }
+});
+
+// ===== MOBILE SWIPE NAVIGATION =====
+let touchStartX=0;
+let touchEndX=0;
+modal.addEventListener("touchstart",e=>{touchStartX=e.changedTouches[0].screenX;});
+modal.addEventListener("touchend",e=>{
+  touchEndX=e.changedTouches[0].screenX;
+  const diff=touchStartX-touchEndX;
+  if(Math.abs(diff)>50){ // minimum swipe distance
+    if(diff>0) nextCard(); else prevCard();
   }
 });
 </script>
