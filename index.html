@@ -6,310 +6,217 @@
 <title>One Piece Card Collection</title>
 <style>
 :root {
-  --pirate-bg: linear-gradient(180deg, #fca311, #e85d04, #d00000);
-  --marine-bg: linear-gradient(180deg, #1e3d59, #3f88c5, #f5f0e1);
-  --light-text: #fff;
-  --dark-text: #111;
-  --accent-red: #d90429;
-  --accent-gold: #ffd700;
+    --pirate-bg: linear-gradient(180deg, #fca311, #e85d04, #d00000);
+    --marine-bg: linear-gradient(180deg, #1e3d59, #3f88c5, #f5f0e1);
+    --light-text: #fff;
+    --dark-text: #111;
+    --accent-red: #d90429;
+    --accent-gold: #ffd700;
 }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;min-height:100vh;background:var(--pirate-bg);color:var(--light-text);transition:background 0.4s ease,color 0.3s ease;}
+body.marine{background:var(--marine-bg);color:var(--dark-text);}
 
-* { box-sizing:border-box; margin:0; padding:0; }
+/* Home Header */
+.home-header{text-align:center;padding:48px 20px;}
+.home-header h1{font-size:clamp(2rem,5vw,2.8rem);margin-bottom:10px;}
+.home-header p{max-width:700px;margin:0 auto 20px;font-size:1.1rem;}
+.header-btns{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
+.btn{padding:10px 20px;border-radius:14px;border:none;font-weight:600;cursor:pointer;transition:0.3s;}
+.btn-primary{background:var(--accent-red);color:#fff;}
+.btn-primary:hover{background:#9f0219;}
+.btn-theme{background:var(--accent-gold);color:#000;}
 
-body {
-  font-family: 'Montserrat', sans-serif;
-  min-height:100vh;
-  background: var(--pirate-bg);
-  color: var(--light-text);
-  transition: background 0.4s ease, color 0.3s ease;
-  overflow-x:hidden;
-}
+/* Home Sections */
+.home-section{margin:40px 0;}
+.home-section h2{font-size:1.6rem;margin-bottom:12px;}
+.home-section ul{list-style-type:disc;margin-left:20px;}
+.social-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;}
 
-body.marine { background: var(--marine-bg); color: var(--dark-text); }
-
-/* Shared header */
-.home-header {
-  text-align:center; padding:48px 20px;
-}
-.home-header h1 { font-size:clamp(2rem,5vw,2.8rem); margin-bottom:10px; }
-.home-header p { max-width:700px; margin:0 auto 20px; font-size:1.1rem; }
-
-/* Buttons */
-.header-btns { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
-.btn { padding:10px 20px; border-radius:14px; border:none; font-weight:600; cursor:pointer; transition:0.3s; }
-.btn-primary { background: var(--accent-red); color:#fff; }
-.btn-primary:hover { background:#9f0219; }
-.btn-theme { background: var(--accent-gold); color:#000; }
-
-/* Filters */
-.controls { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin-top:16px; }
-select { padding:10px 14px; border-radius:12px; border:none; font-weight:600; cursor:pointer; background: rgba(0,0,0,0.25); color:#fff; transition:0.3s; }
-body.marine select { background: rgba(255,255,255,0.9); color:#000; }
-select:focus { outline:2px solid var(--accent-gold); }
+/* Collection Controls */
+.controls{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:16px;}
+select{padding:10px 14px;border-radius:12px;border:none;font-weight:600;cursor:pointer;background:rgba(0,0,0,0.25);color:#fff;transition:0.3s;}
+body.marine select{background:rgba(255,255,255,0.9);color:#000;}
+select:focus{outline:2px solid var(--accent-gold);}
 
 /* Card Grid */
-.card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:22px; padding:24px; }
-.card { perspective:1200px; cursor:pointer; opacity:0; transform:translateY(30px); transition:opacity 0.6s ease, transform 0.6s ease; }
-.card.show { opacity:1; transform:translateY(0); }
-.card-inner { position:relative; width:100%; aspect-ratio:2/3; transform-style: preserve-3d; transition: transform 0.7s cubic-bezier(0.4,0,0.2,1); }
-.card:hover .card-inner, .card.hovered .card-inner { transform:rotateY(180deg); }
-.card-front, .card-back { position:absolute; inset:0; border-radius:16px; backface-visibility:hidden; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.35); transition: box-shadow 0.3s ease; }
-.card:hover .card-front, .card:hover .card-back { box-shadow:0 16px 40px rgba(0,0,0,0.45); }
-.card-front img { width:100%; height:100%; object-fit:cover; }
-.card-back { background:#fff; color:#000; transform:rotateY(180deg); padding:12px; font-size:12px; display:flex; flex-direction:column; justify-content:center; }
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:22px;padding:24px;}
+
+/* Cards */
+.card{perspective:1200px;cursor:pointer;opacity:0;transform:translateY(30px);transition:opacity 0.6s ease, transform 0.6s ease;position:relative;}
+.card.show{opacity:1;transform:translateY(0);}
+.card-inner{position:relative;width:100%;aspect-ratio:2/3;transform-style: preserve-3d;transition: transform 0.7s cubic-bezier(0.4,0,0.2,1);}
+.card:hover .card-inner,.card.hovered .card-inner{transform:rotateY(180deg);}
+.card-front,.card-back{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,0.35);transition: box-shadow 0.3s ease;}
+.card-front img{width:100%;height:100%;object-fit:cover;border-radius:16px;}
+.card-back{background:#fff;color:#000;transform:rotateY(180deg);padding:12px;font-size:12px;display:flex;flex-direction:column;justify-content:center;}
+
+/* Card Names Under Card */
+.card-name{text-align:center;margin-top:6px;font-weight:600;font-size:0.95rem;color:inherit;}
 
 /* Rarity Highlights */
-.rare { box-shadow:0 0 12px rgba(255,215,0,0.6); }
-.super-rare { box-shadow:0 0 14px rgba(0,191,255,0.8); animation: superRareGlow 2.5s infinite alternate ease-in-out; }
-.secret-rare { box-shadow:0 0 18px rgba(255,0,255,0.9); animation: secretRareGlow 3s infinite alternate ease-in-out; }
+.rare{box-shadow:0 0 12px rgba(255,215,0,0.6);}
+.super-rare{box-shadow:0 0 14px rgba(0,191,255,0.8);animation:glowPulse 2s infinite;}
+.secret-rare{box-shadow:0 0 18px rgba(255,0,255,0.9);animation:glowPulse 2s infinite;}
+@keyframes glowPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.03);}}
 
 /* Borders */
-.red { border:2px solid #e63946; }
-.blue { border:2px solid #457b9d; }
-.green { border:2px solid #2a9d8f; }
-.purple { border:2px solid #8338ec; }
-.yellow { border:2px solid #f4d35e; }
-.golden { border:2px solid gold; }
-.black { border:2px solid #000; }
+.red{border:2px solid #e63946;}
+.blue{border:2px solid #457b9d;}
+.green{border:2px solid #2a9d8f;}
+.purple{border:2px solid #8338ec;}
+.yellow{border:2px solid #f4d35e;}
+.golden{border:2px solid gold;}
+.black{border:2px solid #000;}
+.none{border:none;}
 
 /* Modal */
-.modal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; overflow-y:auto; opacity:0; transition:opacity 0.4s ease; }
-.modal-content { background:#fff; color:#000; max-width:900px; width:90%; margin:6vh auto; border-radius:16px; padding:0; display:flex; flex-direction:column; position:relative; overflow:hidden; }
-.close-btn { position:absolute; top:12px; right:16px; font-size:28px; font-weight:bold; cursor:pointer; z-index:10; }
-.modal-body { display:flex; flex-direction:row; max-height:70vh; overflow:hidden; }
-.modal-picture { flex:1; display:flex; justify-content:center; align-items:center; padding:16px; }
-.modal-picture img { max-width:100%; max-height:100%; object-fit:contain; border-radius:12px; }
-.modal-details { flex:1; overflow-y:auto; padding:16px; font-size:14px; line-height:1.5; }
-.modal-details h3 { margin-bottom:8px; }
-.modal-details p { margin-bottom:6px; }
-.modal-details button { margin-top:12px; padding:8px 12px; border:none; border-radius:8px; background:#ff8c00; color:#fff; cursor:pointer; transition:0.3s; }
-.modal-details button:hover { background:#e07b00; }
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;justify-content:center;align-items:center;overflow-y:auto;opacity:0;transition:opacity 0.4s ease;}
+.modal-content{background:#fff;color:#000;max-width:900px;width:90%;margin:6vh auto;border-radius:16px;padding:0;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+.close-btn{position:absolute;top:12px;right:16px;font-size:28px;font-weight:bold;cursor:pointer;z-index:10;}
+.modal-body{display:flex;flex-direction:row;max-height:70vh;overflow:hidden;}
+.modal-picture{flex:1;display:flex;justify-content:center;align-items:center;padding:16px;}
+.modal-picture img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;}
+.modal-details{flex:1;overflow-y:auto;padding:16px;font-size:14px;line-height:1.5;}
+.modal-details h3{margin-bottom:8px;}
+.modal-details p{margin-bottom:6px;}
+.modal-details button{margin-top:12px;padding:8px 12px;border:none;border-radius:8px;background:#ff8c00;color:#fff;cursor:pointer;transition:0.3s;}
+.modal-details button:hover{background:#e07b00;}
 
-/* Scroll animation */
-.scroll-animate { opacity:0; transform:translateY(30px); transition:opacity 0.6s ease, transform 0.6s ease; }
-.scroll-animate.show { opacity:1; transform:translateY(0); }
+/* Scroll Animation */
+.scroll-animate{opacity:0;transform:translateY(30px);transition:opacity 0.6s ease, transform 0.6s ease;}
+.scroll-animate.show{opacity:1;transform:translateY(0);}
 
-/* Home sections */
-.home-section { margin:40px 0; }
-.home-section h2 { font-size:1.6rem; margin-bottom:12px; }
-.home-section ul { list-style-type:disc; margin-left:20px; }
-.social-links { display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; }
-
-/* Keyframes */
-@keyframes superRareGlow { 0%{box-shadow:0 0 10px rgba(0,191,255,0.4);} 50%{box-shadow:0 0 20px rgba(0,191,255,0.7);} 100%{box-shadow:0 0 10px rgba(0,191,255,0.4);} }
-@keyframes secretRareGlow { 0%{box-shadow:0 0 12px rgba(255,0,255,0.5);} 50%{box-shadow:0 0 25px rgba(255,0,255,0.85);} 100%{box-shadow:0 0 12px rgba(255,0,255,0.5);} }
+/* Home & Collection Sections */
+#home-page{display:block;}
+#collection-page{display:none;}
 
 /* Responsive */
-@media(max-width:768px){ .card-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:16px;} .modal-body{flex-direction:column;} }
-@media(max-width:480px){ select,.btn{font-size:0.9rem; padding:8px 12px;} .home-header h1{font-size:clamp(1.8rem,5vw,2.4rem);} .home-header p{font-size:1rem;} }
+@media(max-width:768px){.card-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;}.modal-body{flex-direction:column;}}
+@media(max-width:480px){select,.btn{font-size:0.9rem;padding:8px 12px;}.home-header h1{font-size:clamp(1.8rem,5vw,2.4rem);}.home-header p{font-size:1rem;}}
 </style>
 </head>
 <body>
 
-<!-- Homepage Section -->
+<!-- Home Page -->
 <section id="home-page">
-  <header class="home-header">
-    <h1>Welcome to the Ultimate One Piece Card Collection!</h1>
-    <p>Explore rare, super rare, and secret rare cards from multiple sets. Flip cards, check details, copy links, and manage your own collection!</p>
-    <div class="header-btns">
-      <button class="btn btn-primary" onclick="showCollection()">Browse Collection</button>
-      <button id="themeToggle" class="btn btn-theme">Toggle Theme 🏴‍☠️ (Pirate)</button>
-    </div>
-  </header>
-
-  <main style="max-width:1000px;margin:0 auto;padding:20px;">
-    <section class="home-section">
-      <h2>What You Can Do</h2>
-      <ul>
-        <li>Browse cards from multiple sets with filtering by rarity and set.</li>
-        <li>View detailed card info including code, rarity, price, and abilities.</li>
-        <li>Copy individual card links for sharing with friends or forums.</li>
-        <li>Toggle between Pirate (dark) and Marine (light) themes for better viewing.</li>
-      </ul>
-    </section>
-    <section class="home-section">
-      <h2>Connect with Me</h2>
-      <p>Join me on social media or Discord to discuss cards and trades:</p>
-      <div class="social-links">
-        <a href="https://discord.com/" target="_blank" class="btn btn-primary">Discord</a>
-        <a href="https://www.facebook.com/" target="_blank" class="btn btn-primary">Facebook</a>
-        <a href="https://twitter.com/" target="_blank" class="btn btn-primary">X / Twitter</a>
-      </div>
-    </section>
-    <section class="home-section">
-      <h2>Start Exploring</h2>
-      <p>Click the button below to enter the collection and start exploring all cards:</p>
-      <button class="btn btn-theme" onclick="showCollection()">Go to Collection</button>
-    </section>
-  </main>
+<header class="home-header">
+<h1>Welcome to the Ultimate One Piece Card Collection!</h1>
+<p>Explore rare, super rare, and secret rare cards from multiple sets. Flip cards, check details, copy links, and manage your own collection!</p>
+<div class="header-btns">
+<button class="btn btn-primary" onclick="showCollection()">Browse Collection</button>
+<button id="themeToggle" class="btn btn-theme">Toggle Theme 🏴‍☠️ (Pirate)</button>
+</div>
+</header>
+<main style="max-width:1000px;margin:0 auto;padding:20px;">
+<section class="home-section">
+<h2>What You Can Do</h2>
+<ul>
+<li>Browse cards from multiple sets with filtering by rarity and set.</li>
+<li>View detailed card info including code, rarity, price, and abilities.</li>
+<li>Copy individual card links for sharing with friends or forums.</li>
+<li>Toggle between Pirate (dark) and Marine (light) themes for better viewing.</li>
+</ul>
+</section>
+<section class="home-section">
+<h2>Connect with Me</h2>
+<p>Join me on social media or Discord to discuss cards and trades:</p>
+<div class="social-links">
+<a href="https://discord.com/" target="_blank" class="btn btn-primary">Discord</a>
+<a href="https://www.facebook.com/" target="_blank" class="btn btn-primary">Facebook</a>
+<a href="https://twitter.com/" target="_blank" class="btn btn-primary">X / Twitter</a>
+</div>
+</section>
+<section class="home-section">
+<h2>Start Exploring</h2>
+<p>Click the button below to enter the collection and start exploring all cards:</p>
+<button class="btn btn-theme" onclick="showCollection()">Go to Collection</button>
+</section>
+</main>
 </section>
 
-<!-- Collection Section -->
-<section id="collection-page" style="display:none;">
-  <header class="home-header">
-    <h1>My One Piece Card Collection</h1>
-    <div class="header-btns">
-      <button class="btn btn-primary" onclick="showHome()">🏠 Home</button>
-      <button id="themeToggleCollection" class="btn btn-theme">Toggle Theme 🏴‍☠️ (Pirate)</button>
-    </div>
-    <div class="controls">
-      <select id="rarityFilter">
-        <option value="all">All Rarities</option>
-        <option value="rare">Rare</option>
-        <option value="super rare">Super Rare</option>
-        <option value="secret rare">Secret Rare</option>
-        <option value="uncommon">Uncommon</option>
-      </select>
-      <select id="setFilter">
-        <option value="all">All Sets</option>
-      </select>
-    </div>
-  </header>
-  <main>
-    <div class="card-grid"></div>
-  </main>
+<!-- Collection Page -->
+<section id="collection-page">
+<header class="home-header">
+<h1>My One Piece Card Collection</h1>
+<div class="header-btns">
+<button class="btn btn-primary" onclick="showHome()">🏠 Home</button>
+<button id="themeToggleCollection" class="btn btn-theme">Toggle Theme 🏴‍☠️ (Pirate)</button>
+</div>
+<div class="controls">
+<select id="rarityFilter">
+<option value="all">All Rarities</option>
+<option value="rare">Rare</option>
+<option value="super rare">Super Rare</option>
+<option value="secret rare">Secret Rare</option>
+<option value="uncommon">Uncommon</option>
+</select>
+<select id="setFilter">
+<option value="all">All Sets</option>
+</select>
+</div>
+</header>
+<main>
+<div class="card-grid"></div>
+</main>
 </section>
 
 <!-- Modal -->
 <div class="modal" id="cardModal">
-  <div class="modal-content">
-    <span class="close-btn">&times;</span>
-    <div class="modal-body">
-      <div class="modal-picture"><img src="images/placeholder.jpg" alt="Card Image"></div>
-      <div class="modal-details"></div>
-    </div>
-  </div>
+<div class="modal-content">
+<span class="close-btn">&times;</span>
+<div class="modal-body">
+<div class="modal-picture"><img src="images/placeholder.jpg" alt="Card Image"></div>
+<div class="modal-details"></div>
+</div>
+</div>
 </div>
 
 <script>
-// Home <-> Collection page
-function showCollection(){ document.getElementById('home-page').style.display='none'; document.getElementById('collection-page').style.display='block'; }
-function showHome(){ document.getElementById('collection-page').style.display='none'; document.getElementById('home-page').style.display='block'; }
+// ===== CARDS =====
+const cards = [
+{"code":"OP04-002","name":"Igaram","rarity":"Rare","border":"none","price":1.00,"description":"Defensive support character; usually boosts allies or protects leader.","set":"OP04","image":"images/OP04-002.jpg"},
+{"code":"OP04-006","name":"Koza","rarity":"Uncommon","border":"red","price":0.08,"description":"When Koza attacks, choose 1 opposing character; it cannot attack next turn.","set":"OP04","image":"images/OP04-006.jpg"},
+{"code":"OP04-018","name":"Enchanting Vertigo Dance","rarity":"Uncommon","border":"golden","price":0.10,"description":"All opposing characters lose 1000 power until end of turn.","set":"OP04","image":"images/OP04-018.jpg"},
+{"code":"OP04-028","name":"Diamante","rarity":"Rare","border":"none","price":1.00,"description":"Dressrosa officer; versatile support, often boosts allies or affects opponent’s board.","set":"OP04","image":"images/OP04-028.jpg"},
+{"code":"OP04-034","name":"Lao.G","rarity":"Uncommon","border":"green","price":0.50,"description":"During your turn, Lao.G gains +500 power for each allied character on the field.","set":"OP04","image":"images/OP04-034.jpg"},
+{"code":"OP04-049","name":"Jack","rarity":"Uncommon","border":"blue","price":1.00,"description":"Jack can attack twice per turn if you discard 1 card.","set":"OP04","image":"images/OP04-049.jpg"},
+{"code":"OP04-053","name":"Page One","rarity":"Uncommon","border":"blue","price":1.00,"description":"When entering play, choose 1 enemy character; it cannot block this turn.","set":"OP04","image":"images/OP04-053.jpg"},
+{"code":"OP04-056","name":"Gum‑Gum Red Roc","rarity":"Rare","border":"none","price":2.50,"description":"Event card: Place up to 1 character on the bottom of the owner’s deck. Trigger: place up to one cost‑4 or less character on bottom of owner’s deck.","set":"OP04","image":"images/OP04-056.jpg"},
+{"code":"OP04-059","name":"Iceburg","rarity":"Uncommon","border":"purple","price":1.00,"description":"Once per turn, you may heal 500 life points.","set":"OP04","image":"images/OP04-059.jpg"},
+{"code":"OP04-070","name":"Mr. 3 (Galdino)","rarity":"Uncommon","border":"purple","price":1.00,"description":"You can create a Wax Clone (0/500) when Mr. 3 attacks.","set":"OP04","image":"images/OP04-070.jpg"},
+{"code":"OP04-072","name":"Mr.5 (Gem)","rarity":"Rare","border":"none","price":1.50,"description":"Character with attack-focused abilities; foil/alternate art versions can reach $10–$30+.","set":"OP04","image":"images/OP04-072.jpg"},
+{"code":"OP04-082","name":"Kyros","rarity":"Rare","border":"none","price":1.99,"description":"Strong board presence; tanky fighter with moderate cost.","set":"OP04","image":"images/OP04-082.jpg"},
+{"code":"OP04-085","name":"Suleiman","rarity":"Uncommon","border":"black","price":1.00,"description":"Opponent discards 1 card when Suleiman enters play.","set":"OP04","image":"images/OP04-085.jpg"},
+{"code":"OP04-102","name":"Kin’emon","rarity":"Rare","border":"none","price":0.10,"description":"Fast attacker or utility character; low market demand keeps price low.","set":"OP04","image":"images/OP04-102.jpg"},
+{"code":"OP04-104","name":"Sanji","rarity":"Super Rare","border":"none","price":1.00,"description":"Blocker; helps defend leader, strong mid-cost, can be played by trashing a card.","set":"OP04","image":"images/OP04-104.jpg"},
+{"code":"OP04-108","name":"Charlotte Moscato","rarity":"Uncommon","border":"yellow","price":1.00,"description":"When attacking, choose 1 opposing character; reduce its power by 500.","set":"OP04","image":"images/OP04-108.jpg"},
+{"code":"OP04-116","name":"Diable Jambe Joue Shot","rarity":"Uncommon","border":"golden","price":1.00,"description":"Deal 2000 damage to 1 opposing character.","set":"OP04","image":"images/OP04-116.jpg"},
+{"code":"OP04-118","name":"One Piece Nefeltari Vivi Secret Rare","rarity":"Secret Rare","border":"red","price":4.90,"description":"Red character (Vivi). High-cost board impact with Rush keyword for your other big red characters; strong play-effect synergy.","set":"OP04","image":"images/OP04-118.jpg"},
 
-// Theme toggle
-const themeBtn = document.getElementById('themeToggle') || document.getElementById('themeToggleCollection');
-const body = document.body;
-if(localStorage.getItem('theme')==='marine'){ body.classList.add('marine'); }
-themeBtn.addEventListener('click', ()=>{
-  body.classList.toggle('marine');
-  localStorage.setItem('theme', body.classList.contains('marine')?'marine':'pirate');
-});
+{"code":"OP08-010","name":"Hiking Bear","rarity":"Uncommon","border":"red","price":1.00,"description":"When Hiking Bear attacks, draw 1 card.","set":"OP08","image":"images/OP08-010.jpg"},
+{"code":"OP08-042","name":"Edward Weevil","rarity":"Uncommon","border":"blue","price":0.55,"description":"If opponent has 3 or more characters, Edward Weevil gains +1000 power.","set":"OP08","image":"images/OP08-042.jpg"},
+{"code":"OP08-046","name":"Shakuyaku","rarity":"Rare","border":"none","price":0.05,"description":"On play: can force opponent to place a card from hand to bottom of deck if conditions met.","set":"OP08","image":"images/OP08-046.jpg"},
+{"code":"OP08-066","name":"Charlotte Brûlée","rarity":"Uncommon","border":"purple","price":0.55,"description":"When entering play, look at opponent's hand and choose 1 card; it cannot be used next turn.","set":"OP08","image":"images/OP08-066.jpg"},
+{"code":"OP08-067","name":"Charlotte Pudding","rarity":"Rare","border":"none","price":0.50,"description":"Your turn: interact with DON!! cards; allows deck manipulation. Alternate art can be higher.","set":"OP08","image":"images/OP08-067.jpg"},
+{"code":"OP08-080","name":"Queen","rarity":"Rare","border":"none","price":0.25,"description":"On play: look at top 5 cards of your deck, add an Animal Kingdom Pirates card to hand, rest the rest.","set":"OP08","image":"images/OP08-080.jpg"},
+{"code":"OP08-084","name":"Jack","rarity":"Super Rare","border":"none","price":0.20,"description":"High-cost heavy hitter; can draw/discard and KO small enemy characters when activated.","set":"OP08","image":"images/OP08-084.jpg"},
+{"code":"OP08-103","name":"Charlotte Custard","rarity":"Uncommon","border":"yellow","price":0.55,"description":"Custard gains +500 power for each other Big Mom Pirate character on field.","set":"OP08","image":"images/OP08-103.jpg"},
+{"code":"OP08-111","name":"S-Shark","rarity":"Uncommon","border":"yellow","price":0.55,"description":"When attacking, opponent discards 1 card unless they pay 1 energy.","set":"OP08","image":"images/OP08-111.jpg"},
 
-// Animate header
-const header = document.querySelector('#home-page h1');
-const subtext = document.querySelector('#home-page p');
-header.style.opacity=0; header.style.transform="translateY(-20px)";
-subtext.style.opacity=0; subtext.style.transform="translateY(20px)";
-setTimeout(()=>{header.style.transition="opacity 1s ease, transform 1s ease"; header.style.opacity=1; header.style.transform="translateY(0)";},150);
-setTimeout(()=>{subtext.style.transition="opacity 1s ease 0.3s, transform 1s ease 0.3s"; subtext.style.opacity=1; subtext.style.transform="translateY(0)";},400);
+{"code":"EB03-005","name":"Sugar","rarity":"Rare","border":"none","price":1.00,"description":"Donquixote Pirates support; can play other characters from hand rested if leader is Sugar.","set":"EB03","image":"images/EB03-005.jpg"},
 
-// Cards
-let cards=[];
-document.addEventListener("DOMContentLoaded",()=>{ loadCards(); setupThemeCollection(); });
+{"code":"Don-Card-Vivi","name":"Nefeltari Vivi","rarity":"Rare","border":"black","price":3.00,"description":"Standard black-border DON!! card; Your Turn +1000 effect to boost your characters.","set":"DON","image":"images/Don-Card-Vivi.jpg"},
+{"code":"Don-Card-Boa-Hancock","name":"Boa Hancock","rarity":"Rare","border":"black","price":4.00,"description":"Standard black-border DON!! card; Your Turn +1000 effect. Alternate art or foil can be much higher.","set":"DON","image":"images/Don-Card-Boa-Hancock.jpg"}
+];
 
-async function loadCards(){
-  try{
-    const res=await fetch("cards.json");
-    cards=await res.json();
-    renderCards(cards); populateSetFilter(); setupFilters(); setupModal(); animateOnScroll();
-  }catch(e){ console.error("Failed to load cards:",e); }
-}
+// ===== PAGE SWITCHING =====
+function showCollection(){document.getElementById("home-page").style.display="none";document.getElementById("collection-page").style.display="block";}
+function showHome(){document.getElementById("collection-page").style.display="none";document.getElementById("home-page").style.display="block";}
 
-function renderCards(cards){
-  const grid=document.querySelector("#collection-page .card-grid");
-  grid.innerHTML="";
-  cards.forEach(card=>{
-    const borderClass = card.border && card.border.toLowerCase()!=="none"?card.border.toLowerCase():"";
-    const rarityClass = card.rarity.toLowerCase().replace(" ","-");
-    const div=document.createElement("div");
-    div.className=`card ${borderClass} ${rarityClass} scroll-animate`;
-    div.dataset.id=card.code; div.dataset.name=card.name; div.dataset.desc=card.description;
-    div.dataset.image=card.image||"images/placeholder.jpg"; div.dataset.rarity=card.rarity.toLowerCase();
-    div.dataset.price=card.price; div.dataset.set=card.set;
-    div.innerHTML=`<div class="card-inner">
-      <div class="card-front"><img src="${div.dataset.image}" loading="lazy" alt="${card.name}"></div>
-      <div class="card-back">
-        <p><strong>${card.name}</strong></p>
-        <p>Code: ${card.code}</p>
-        <p>Rarity: ${card.rarity}</p>
-        <p>Price: $${card.price}</p>
-        <p>${card.description}</p>
-      </div>
-    </div>`;
-    grid.appendChild(div);
-    div.addEventListener("mouseenter",()=>div.classList.add("hovered"));
-    div.addEventListener("mouseleave",()=>div.classList.remove("hovered"));
-    div.addEventListener("click",()=>openModal(div));
-  });
-}
-
-function populateSetFilter(){
-  const setFilter=document.getElementById("setFilter");
-  const sets=[...new Set(cards.map(c=>c.set))];
-  sets.forEach(s=>setFilter.innerHTML+=`<option value="${s}">${s}</option>`);
-}
-
-function setupFilters(){
-  const setFilter=document.getElementById("setFilter");
-  const rarityFilter=document.getElementById("rarityFilter");
-  const grid=document.querySelector("#collection-page .card-grid");
-  function applyFilters(){
-    const setVal=setFilter.value;
-    const rarityVal=rarityFilter.value;
-    grid.querySelectorAll(".card").forEach(card=>{
-      const matchSet=setVal==="all" || card.dataset.set===setVal;
-      const matchRarity=rarityVal==="all" || card.dataset.rarity===rarityVal;
-      card.style.display=matchSet&&matchRarity?"block":"none";
-    });
-  }
-  setFilter.addEventListener("change",applyFilters);
-  rarityFilter.addEventListener("change",applyFilters);
-}
-
-// Modal
-function setupModal(){
-  const modal=document.getElementById("cardModal");
-  const closeBtn=modal.querySelector(".close-btn");
-  closeBtn.addEventListener("click",closeModal);
-  modal.addEventListener("click",e=>{ if(e.target===modal) closeModal(); });
-  document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeModal(); });
-}
-
-function openModal(card){
-  const modal=document.getElementById("cardModal");
-  const imgEl=modal.querySelector(".modal-picture img");
-  const detailsEl=modal.querySelector(".modal-details");
-  const cardLink=`${location.origin}${location.pathname}?card=${encodeURIComponent(card.dataset.id)}`;
-  imgEl.src=card.dataset.image;
-  detailsEl.innerHTML=`<h3>${card.dataset.name}</h3>
-    <p>Code: ${card.dataset.id}</p>
-    <p>Rarity: ${card.dataset.rarity}</p>
-    <p>Price: $${card.dataset.price}</p>
-    <p>${card.dataset.desc}</p>
-    <button id="copyLinkBtn">Copy Link</button>
-    <span id="copyMsg" style="margin-left:10px;color:green;display:none;">Copied!</span>`;
-  document.getElementById("copyLinkBtn").addEventListener("click",()=>{
-    navigator.clipboard.writeText(cardLink).then(()=>{
-      const copyMsg=document.getElementById("copyMsg");
-      copyMsg.style.display="inline";
-      setTimeout(()=>copyMsg.style.display="none",1500);
-    });
-  });
-  modal.style.display="flex";
-  modal.style.opacity=0;
-  setTimeout(()=>modal.style.transition="opacity 0.4s ease",50);
-  setTimeout(()=>modal.style.opacity=1,100);
-  document.body.style.overflow="hidden";
-}
-
-function closeModal(){
-  const modal=document.getElementById("cardModal");
-  modal.style.opacity=0;
-  setTimeout(()=>{ modal.style.display="none"; document.body.style.overflow=""; },300);
-}
-
-function setupThemeCollection(){
-  const btn=document.getElementById("themeToggleCollection");
+// ===== THEME TOGGLE =====
+function setupThemeToggle(btnId){
+  const btn=document.getElementById(btnId);
   if(!btn) return;
   btn.addEventListener("click",()=>{
     document.body.classList.toggle("marine");
@@ -318,16 +225,106 @@ function setupThemeCollection(){
     localStorage.setItem('theme',isMarine?'marine':'pirate');
   });
 }
+setupThemeToggle('themeToggle');
+setupThemeToggle('themeToggleCollection');
+if(localStorage.getItem('theme')==='marine') document.body.classList.add('marine');
 
-// Scroll animations
-function animateOnScroll(){
-  const scrollElements=document.querySelectorAll(".scroll-animate");
-  const observer=new IntersectionObserver(entries=>{
-    entries.forEach(entry=>{ if(entry.isIntersecting){ entry.target.classList.add("show"); observer.unobserve(entry.target); } });
-  },{threshold:0.2});
-  scrollElements.forEach(el=>observer.observe(el));
+// ===== CARD RENDERING =====
+const grid=document.querySelector(".card-grid");
+const rarityFilter=document.getElementById("rarityFilter");
+const setFilter=document.getElementById("setFilter");
+
+// Populate sets
+[...new Set(cards.map(c=>c.set))].forEach(s=>{
+  const o=document.createElement("option"); o.value=s; o.textContent=s; setFilter.appendChild(o);
+});
+
+function renderCards(){
+  grid.innerHTML="";
+  const r=rarityFilter.value; const s=setFilter.value;
+  cards.filter(c=>(r==='all'||c.rarity.toLowerCase()===r)&&(s==='all'||c.set===s)).forEach((c,index)=>{
+    const cardDiv=document.createElement("div");
+    cardDiv.className="card scroll-animate";
+    const rarityClass=c.rarity.toLowerCase().replace(' ','-');
+    cardDiv.innerHTML=`
+      <div class="card-inner ${rarityClass} ${c.border}">
+        <div class="card-front">
+          <img src="${c.image||'images/placeholder.jpg'}" alt="${c.name}">
+        </div>
+        <div class="card-back">
+          <h3>${c.name}</h3>
+          <p><strong>Code:</strong> ${c.code}</p>
+          <p><strong>Rarity:</strong> ${c.rarity}</p>
+          <p><strong>Price:</strong> $${c.price}</p>
+        </div>
+      </div>
+      <div class="card-name">${c.name}</div>
+    `;
+    cardDiv.dataset.index=index;
+    cardDiv.dataset.id=c.code;
+    cardDiv.dataset.name=c.name;
+    cardDiv.dataset.rarity=c.rarity;
+    cardDiv.dataset.price=c.price;
+    cardDiv.dataset.desc=c.description;
+    cardDiv.dataset.image=c.image||'images/placeholder.jpg';
+    cardDiv.addEventListener("click",()=>openModal(cardDiv));
+    grid.appendChild(cardDiv);
+  });
+  animateOnScroll();
 }
-</script>
+rarityFilter.addEventListener("change",renderCards);
+setFilter.addEventListener("change",renderCards);
+renderCards();
 
+// ===== MODAL =====
+const modal=document.getElementById("cardModal");
+const closeBtn=modal.querySelector(".close-btn");
+
+function openModal(cardDiv){
+  modal.querySelector(".modal-picture img").src=cardDiv.dataset.image;
+  modal.querySelector(".modal-details").innerHTML=`
+    <h3>${cardDiv.dataset.name}</h3>
+    <p><strong>Code:</strong> ${cardDiv.dataset.id}</p>
+    <p><strong>Rarity:</strong> ${cardDiv.dataset.rarity}</p>
+    <p><strong>Price:</strong> $${cardDiv.dataset.price}</p>
+    <p>${cardDiv.dataset.desc}</p>
+    <button id="copyBtn">Copy Card Link</button>
+  `;
+  const copyBtn=document.getElementById("copyBtn");
+  copyBtn.addEventListener("click",()=>{
+    const cardIndex=cardDiv.dataset.index;
+    const url=`${window.location.href.split('?')[0]}?card=${cardIndex}`;
+    navigator.clipboard.writeText(url).then(()=>{copyBtn.textContent="Copied!";setTimeout(()=>copyBtn.textContent="Copy Card Link",1500);});
+  });
+  modal.style.display="flex"; setTimeout(()=>modal.style.opacity=1,50);
+}
+closeBtn.addEventListener("click",()=>{modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);});
+window.addEventListener("click",e=>{if(e.target===modal){modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);}});
+
+// ===== SCROLL ANIMATION =====
+function animateOnScroll(){document.querySelectorAll(".scroll-animate").forEach(el=>{const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("show");observer.unobserve(entry.target);}});},{threshold:0.2});observer.observe(el);});}
+
+// ===== HIGHLIGHT CARD FROM URL =====
+window.addEventListener("DOMContentLoaded",()=>{
+  const params=new URLSearchParams(window.location.search);
+  const cardParam=params.get("card");
+  if(cardParam){
+    showCollection();
+    renderCards();
+    const idx=parseInt(cardParam,10);
+    if(!isNaN(idx)&&cards[idx]){
+      setTimeout(()=>{
+        const targetCard=document.querySelectorAll(".card")[idx];
+        if(targetCard){
+          targetCard.scrollIntoView({behavior:"smooth",block:"center"});
+          openModal(targetCard);
+        }
+      },100);
+    }
+  }
+});
+</script>
 </body>
 </html>
+
+
