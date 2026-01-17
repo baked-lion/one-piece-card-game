@@ -45,12 +45,15 @@ select:focus{outline:2px solid var(--accent-gold);}
 /* Cards */
 .card{cursor:pointer;opacity:0;transform:translateY(30px);transition:opacity 0.6s ease, transform 0.6s ease;position:relative;}
 .card.show{opacity:1;transform:translateY(0);}
-.card-inner{position:relative;width:100%;aspect-ratio:2/3;transform-style: preserve-3d;transition: transform 0.7s cubic-bezier(0.4,0,0.2,1);}
-.card:hover .card-inner,.card.hovered .card-inner{transform:rotateY(180deg);}
-.card-front,.card-back{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,0.35);transition: box-shadow 0.3s ease;}
+.card-inner{position:relative;width:100%;aspect-ratio:2/3;transition: transform 0.7s cubic-bezier(0.4,0,0.2,1);}
+.card-front,.card-back{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,0.35);}
 .card-front img{width:100%;height:100%;object-fit:cover;border-radius:16px;}
 .card-back{background:#fff;color:#000;transform:rotateY(180deg);padding:12px;font-size:12px;display:flex;flex-direction:column;justify-content:center;}
-.card-name{text-align:center;margin-top:6px;font-weight:600;font-size:0.95rem;color:inherit;}
+
+/* Mobile: disable 3D flip */
+@media(max-width:768px){
+  .card-inner{transform:rotateY(0)!important;}
+}
 
 /* Rarity Highlights */
 .rare{box-shadow:0 0 12px rgba(255,215,0,0.6);}
@@ -80,6 +83,11 @@ select:focus{outline:2px solid var(--accent-gold);}
 .modal-details button{margin-top:12px;padding:8px 12px;border:none;border-radius:8px;background:#ff8c00;color:#fff;cursor:pointer;transition:0.3s;}
 .modal-details button:hover{background:#e07b00;}
 
+/* Modal nav buttons */
+.modal-nav{display:flex;justify-content:space-between;margin-top:12px;}
+.modal-nav button{background:#457b9d;color:#fff;padding:6px 12px;border-radius:8px;border:none;cursor:pointer;transition:0.3s;}
+.modal-nav button:hover{background:#1e3d59;}
+
 /* Scroll Animation */
 .scroll-animate{opacity:0;transform:translateY(30px);transition:opacity 0.6s ease, transform 0.6s ease;}
 .scroll-animate.show{opacity:1;transform:translateY(0);}
@@ -88,22 +96,9 @@ select:focus{outline:2px solid var(--accent-gold);}
 #home-page{display:block;}
 #collection-page{display:none;}
 
-/* Responsive adjustments for mobile/tablet */
-@media(max-width:768px){
-  .card-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;}
-  .modal-body{flex-direction:column;max-height:80vh;overflow-y:auto;}
-  .modal-picture,.modal-details{width:100%;flex:none;padding:12px;}
-  .modal-details{overflow-y:auto;}
-  .card-inner{transform:none !important;} /* remove hover flip on mobile */
-}
-@media(max-width:480px){
-  select,.btn{font-size:0.9rem;padding:8px 12px;}
-  .home-header h1{font-size:clamp(1.8rem,5vw,2.4rem);}
-  .home-header p{font-size:1rem;}
-}
-
-/* Toast for mobile copy */
-#copyToast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#ff8c00;color:#fff;padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity 0.3s ease;z-index:10000;font-weight:600;font-size:0.95rem;}
+/* Responsive */
+@media(max-width:768px){.card-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;}.modal-body{flex-direction:column;}}
+@media(max-width:480px){select,.btn{font-size:0.9rem;padding:8px 12px;}.home-header h1{font-size:clamp(1.8rem,5vw,2.4rem);}.home-header p{font-size:1rem;}}
 </style>
 </head>
 <body>
@@ -126,6 +121,7 @@ select:focus{outline:2px solid var(--accent-gold);}
 <li>View detailed card info including code, rarity, price, and abilities.</li>
 <li>Copy individual card links for sharing with friends or forums.</li>
 <li>Toggle between Pirate (dark) and Marine (light) themes for better viewing.</li>
+<li>Jump directly to a card using sharable numeric links (e.g., ?card=0).</li>
 </ul>
 </section>
 <section class="home-section">
@@ -164,6 +160,7 @@ select:focus{outline:2px solid var(--accent-gold);}
 <select id="setFilter">
 <option value="all">All Sets</option>
 </select>
+<button class="btn btn-theme" id="randomCardBtn">Random Card</button>
 </div>
 </header>
 <main>
@@ -181,9 +178,6 @@ select:focus{outline:2px solid var(--accent-gold);}
 </div>
 </div>
 </div>
-
-<!-- Mobile toast -->
-<div id="copyToast"></div>
 
 <script>
 // ===== CARDS =====
@@ -222,6 +216,7 @@ const cards = [
 {"code":"Don-Card-Vivi","name":"Nefeltari Vivi","rarity":"Rare","border":"black","price":3.00,"description":"Standard black-border DON!! card; Your Turn +1000 effect to boost your characters.","set":"DON","image":"images/Don-Card-Vivi.jpg"},
 {"code":"Don-Card-Boa-Hancock","name":"Boa Hancock","rarity":"Rare","border":"black","price":4.00,"description":"Standard black-border DON!! card; Your Turn +1000 effect. Alternate art or foil can be much higher.","set":"DON","image":"images/Don-Card-Boa-Hancock.jpg"}
 ];
+
 // ===== PAGE SWITCHING =====
 function showCollection(){document.getElementById("home-page").style.display="none";document.getElementById("collection-page").style.display="block";}
 function showHome(){document.getElementById("collection-page").style.display="none";document.getElementById("home-page").style.display="block";}
@@ -254,13 +249,15 @@ const setFilter=document.getElementById("setFilter");
 function renderCards(){
   grid.innerHTML="";
   const r=rarityFilter.value; const s=setFilter.value;
-  cards.filter(c=>(r==='all'||c.rarity.toLowerCase()===r)&&(s==='all'||c.set===s)).forEach(c=>{
+  cards.filter(c=>(r==='all'||c.rarity.toLowerCase()===r)&&(s==='all'||c.set===s)).forEach((c,i)=>{
     const cardDiv=document.createElement("div");
     cardDiv.className="card scroll-animate";
     const rarityClass=c.rarity.toLowerCase().replace(' ','-');
     cardDiv.innerHTML=`
       <div class="card-inner ${rarityClass} ${c.border}">
-        <div class="card-front"><img src="${c.image||'images/placeholder.jpg'}" alt="${c.name}"></div>
+        <div class="card-front">
+          <img src="${c.image||'images/placeholder.jpg'}" alt="${c.name}">
+        </div>
         <div class="card-back">
           <h3>${c.name}</h3>
           <p><strong>Code:</strong> ${c.code}</p>
@@ -268,15 +265,14 @@ function renderCards(){
           <p><strong>Price:</strong> $${c.price}</p>
         </div>
       </div>
-      <div class="card-name">${c.name}</div>
     `;
-    cardDiv.dataset.id=c.code;
+    cardDiv.dataset.index=i;
     cardDiv.dataset.name=c.name;
     cardDiv.dataset.rarity=c.rarity;
     cardDiv.dataset.price=c.price;
     cardDiv.dataset.desc=c.description;
     cardDiv.dataset.image=c.image||'images/placeholder.jpg';
-    cardDiv.addEventListener("click",()=>openModal(cardDiv));
+    cardDiv.addEventListener("click",()=>openModal(i));
     grid.appendChild(cardDiv);
   });
   animateOnScroll();
@@ -288,36 +284,34 @@ renderCards();
 // ===== MODAL =====
 const modal=document.getElementById("cardModal");
 const closeBtn=modal.querySelector(".close-btn");
-function openModal(cardDiv){
-  modal.querySelector(".modal-picture img").src=cardDiv.dataset.image;
+let currentIndex=null;
+
+function openModal(index){
+  currentIndex=index;
+  const c=cards[index];
+  modal.querySelector(".modal-picture img").src=c.image;
   modal.querySelector(".modal-details").innerHTML=`
-    <h3>${cardDiv.dataset.name}</h3>
-    <p><strong>Code:</strong> ${cardDiv.dataset.id}</p>
-    <p><strong>Rarity:</strong> ${cardDiv.dataset.rarity}</p>
-    <p><strong>Price:</strong> $${cardDiv.dataset.price}</p>
-    <p>${cardDiv.dataset.desc}</p>
+    <h3>${c.name}</h3>
+    <p><strong>Code:</strong> ${c.code}</p>
+    <p><strong>Rarity:</strong> ${c.rarity}</p>
+    <p><strong>Price:</strong> $${c.price}</p>
+    <p>${c.description}</p>
+    <div class="modal-nav">
+      <button onclick="prevCard()">◀ Prev</button>
+      <button onclick="nextCard()">Next ▶</button>
+    </div>
     <button id="copyBtn">Copy Card Link</button>
   `;
-  const copyBtn=document.getElementById("copyBtn");
-  copyBtn.addEventListener("click",()=>{
-    const cardSlug=cardDiv.dataset.name.replace(/\s+/g,'-');
-    const url=window.location.href.split('?')[0]+`?card=${cardDiv.dataset.id}-${cardSlug}`;
-    navigator.clipboard.writeText(url).then(()=>{
-      if(window.innerWidth<=768){ // mobile/tablet toast
-        const toast=document.getElementById("copyToast");
-        toast.textContent="Card link copied!";
-        toast.style.opacity=1;
-        setTimeout(()=>toast.style.opacity=0,1500);
-      } else { // desktop change button text
-        copyBtn.textContent="Copied!";
-        setTimeout(()=>copyBtn.textContent="Copy Card Link",1500);
-      }
-    });
-  });
+  document.getElementById("copyBtn").onclick=()=>{navigator.clipboard.writeText(window.location.href.split('?')[0]+`?card=${index}`).then(()=>{alert("Copied link!");});};
   modal.style.display="flex"; setTimeout(()=>modal.style.opacity=1,50);
 }
-closeBtn.addEventListener("click",()=>{modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);});
-window.addEventListener("click",(e)=>{if(e.target===modal){modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);}});
+function closeModal(){modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);}
+closeBtn.addEventListener("click",closeModal);
+window.addEventListener("click",e=>{if(e.target===modal) closeModal();});
+
+function nextCard(){if(currentIndex<cards.length-1) openModal(currentIndex+1);}
+function prevCard(){if(currentIndex>0) openModal(currentIndex-1);}
+document.getElementById("randomCardBtn").addEventListener("click",()=>openModal(Math.floor(Math.random()*cards.length)));
 
 // ===== SCROLL ANIMATION =====
 function animateOnScroll(){
@@ -331,14 +325,10 @@ function animateOnScroll(){
 window.addEventListener("DOMContentLoaded",()=>{
   const params=new URLSearchParams(window.location.search);
   const cardParam=params.get("card");
-  if(cardParam){
+  if(cardParam!==null){
     showCollection();
-    const cardId=cardParam.split('-')[0];
-    const targetCard=document.querySelector(`.card[data-id='${cardId}']`);
-    if(targetCard){
-      targetCard.scrollIntoView({behavior:"smooth",block:"center"});
-      openModal(targetCard);
-    }
+    const index=parseInt(cardParam);
+    if(!isNaN(index)&&index>=0&&index<cards.length) openModal(index);
   }
 });
 </script>
