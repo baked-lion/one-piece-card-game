@@ -43,22 +43,19 @@ select:focus{outline:2px solid var(--accent-gold);}
 .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:22px;padding:24px;}
 
 /* Cards */
-.card{perspective:1200px;cursor:pointer;opacity:0;transform:translateY(30px);transition:opacity 0.6s ease, transform 0.6s ease;position:relative;}
+.card{cursor:pointer;opacity:0;transform:translateY(30px);transition:opacity 0.6s ease, transform 0.6s ease;position:relative;}
 .card.show{opacity:1;transform:translateY(0);}
 .card-inner{position:relative;width:100%;aspect-ratio:2/3;transform-style: preserve-3d;transition: transform 0.7s cubic-bezier(0.4,0,0.2,1);}
 .card:hover .card-inner,.card.hovered .card-inner{transform:rotateY(180deg);}
 .card-front,.card-back{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,0.35);transition: box-shadow 0.3s ease;}
 .card-front img{width:100%;height:100%;object-fit:cover;border-radius:16px;}
 .card-back{background:#fff;color:#000;transform:rotateY(180deg);padding:12px;font-size:12px;display:flex;flex-direction:column;justify-content:center;}
-
-/* Card Names Under Card */
 .card-name{text-align:center;margin-top:6px;font-weight:600;font-size:0.95rem;color:inherit;}
 
 /* Rarity Highlights */
 .rare{box-shadow:0 0 12px rgba(255,215,0,0.6);}
-.super-rare{box-shadow:0 0 14px rgba(0,191,255,0.8);animation:glowPulse 2s infinite;}
-.secret-rare{box-shadow:0 0 18px rgba(255,0,255,0.9);animation:glowPulse 2s infinite;}
-@keyframes glowPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.03);}}
+.super-rare{box-shadow:0 0 14px rgba(0,191,255,0.8);}
+.secret-rare{box-shadow:0 0 18px rgba(255,0,255,0.9);}
 
 /* Borders */
 .red{border:2px solid #e63946;}
@@ -91,9 +88,22 @@ select:focus{outline:2px solid var(--accent-gold);}
 #home-page{display:block;}
 #collection-page{display:none;}
 
-/* Responsive */
-@media(max-width:768px){.card-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;}.modal-body{flex-direction:column;}}
-@media(max-width:480px){select,.btn{font-size:0.9rem;padding:8px 12px;}.home-header h1{font-size:clamp(1.8rem,5vw,2.4rem);}.home-header p{font-size:1rem;}}
+/* Responsive adjustments for mobile/tablet */
+@media(max-width:768px){
+  .card-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;}
+  .modal-body{flex-direction:column;max-height:80vh;overflow-y:auto;}
+  .modal-picture,.modal-details{width:100%;flex:none;padding:12px;}
+  .modal-details{overflow-y:auto;}
+  .card-inner{transform:none !important;} /* remove hover flip on mobile */
+}
+@media(max-width:480px){
+  select,.btn{font-size:0.9rem;padding:8px 12px;}
+  .home-header h1{font-size:clamp(1.8rem,5vw,2.4rem);}
+  .home-header p{font-size:1rem;}
+}
+
+/* Toast for mobile copy */
+#copyToast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#ff8c00;color:#fff;padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity 0.3s ease;z-index:10000;font-weight:600;font-size:0.95rem;}
 </style>
 </head>
 <body>
@@ -172,6 +182,9 @@ select:focus{outline:2px solid var(--accent-gold);}
 </div>
 </div>
 
+<!-- Mobile toast -->
+<div id="copyToast"></div>
+
 <script>
 // ===== CARDS =====
 const cards = [
@@ -209,7 +222,6 @@ const cards = [
 {"code":"Don-Card-Vivi","name":"Nefeltari Vivi","rarity":"Rare","border":"black","price":3.00,"description":"Standard black-border DON!! card; Your Turn +1000 effect to boost your characters.","set":"DON","image":"images/Don-Card-Vivi.jpg"},
 {"code":"Don-Card-Boa-Hancock","name":"Boa Hancock","rarity":"Rare","border":"black","price":4.00,"description":"Standard black-border DON!! card; Your Turn +1000 effect. Alternate art or foil can be much higher.","set":"DON","image":"images/Don-Card-Boa-Hancock.jpg"}
 ];
-
 // ===== PAGE SWITCHING =====
 function showCollection(){document.getElementById("home-page").style.display="none";document.getElementById("collection-page").style.display="block";}
 function showHome(){document.getElementById("collection-page").style.display="none";document.getElementById("home-page").style.display="block";}
@@ -242,15 +254,13 @@ const setFilter=document.getElementById("setFilter");
 function renderCards(){
   grid.innerHTML="";
   const r=rarityFilter.value; const s=setFilter.value;
-  cards.filter(c=>(r==='all'||c.rarity.toLowerCase()===r)&&(s==='all'||c.set===s)).forEach((c,index)=>{
+  cards.filter(c=>(r==='all'||c.rarity.toLowerCase()===r)&&(s==='all'||c.set===s)).forEach(c=>{
     const cardDiv=document.createElement("div");
     cardDiv.className="card scroll-animate";
     const rarityClass=c.rarity.toLowerCase().replace(' ','-');
     cardDiv.innerHTML=`
       <div class="card-inner ${rarityClass} ${c.border}">
-        <div class="card-front">
-          <img src="${c.image||'images/placeholder.jpg'}" alt="${c.name}">
-        </div>
+        <div class="card-front"><img src="${c.image||'images/placeholder.jpg'}" alt="${c.name}"></div>
         <div class="card-back">
           <h3>${c.name}</h3>
           <p><strong>Code:</strong> ${c.code}</p>
@@ -260,7 +270,6 @@ function renderCards(){
       </div>
       <div class="card-name">${c.name}</div>
     `;
-    cardDiv.dataset.index=index;
     cardDiv.dataset.id=c.code;
     cardDiv.dataset.name=c.name;
     cardDiv.dataset.rarity=c.rarity;
@@ -279,7 +288,6 @@ renderCards();
 // ===== MODAL =====
 const modal=document.getElementById("cardModal");
 const closeBtn=modal.querySelector(".close-btn");
-
 function openModal(cardDiv){
   modal.querySelector(".modal-picture img").src=cardDiv.dataset.image;
   modal.querySelector(".modal-details").innerHTML=`
@@ -292,17 +300,32 @@ function openModal(cardDiv){
   `;
   const copyBtn=document.getElementById("copyBtn");
   copyBtn.addEventListener("click",()=>{
-    const cardIndex=cardDiv.dataset.index;
-    const url=`${window.location.href.split('?')[0]}?card=${cardIndex}`;
-    navigator.clipboard.writeText(url).then(()=>{copyBtn.textContent="Copied!";setTimeout(()=>copyBtn.textContent="Copy Card Link",1500);});
+    const cardSlug=cardDiv.dataset.name.replace(/\s+/g,'-');
+    const url=window.location.href.split('?')[0]+`?card=${cardDiv.dataset.id}-${cardSlug}`;
+    navigator.clipboard.writeText(url).then(()=>{
+      if(window.innerWidth<=768){ // mobile/tablet toast
+        const toast=document.getElementById("copyToast");
+        toast.textContent="Card link copied!";
+        toast.style.opacity=1;
+        setTimeout(()=>toast.style.opacity=0,1500);
+      } else { // desktop change button text
+        copyBtn.textContent="Copied!";
+        setTimeout(()=>copyBtn.textContent="Copy Card Link",1500);
+      }
+    });
   });
   modal.style.display="flex"; setTimeout(()=>modal.style.opacity=1,50);
 }
 closeBtn.addEventListener("click",()=>{modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);});
-window.addEventListener("click",e=>{if(e.target===modal){modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);}});
+window.addEventListener("click",(e)=>{if(e.target===modal){modal.style.opacity=0;setTimeout(()=>modal.style.display="none",300);}});
 
 // ===== SCROLL ANIMATION =====
-function animateOnScroll(){document.querySelectorAll(".scroll-animate").forEach(el=>{const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("show");observer.unobserve(entry.target);}});},{threshold:0.2});observer.observe(el);});}
+function animateOnScroll(){
+  document.querySelectorAll(".scroll-animate").forEach(el=>{
+    const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("show");observer.unobserve(entry.target);}});},{threshold:0.2});
+    observer.observe(el);
+  });
+}
 
 // ===== HIGHLIGHT CARD FROM URL =====
 window.addEventListener("DOMContentLoaded",()=>{
@@ -310,21 +333,14 @@ window.addEventListener("DOMContentLoaded",()=>{
   const cardParam=params.get("card");
   if(cardParam){
     showCollection();
-    renderCards();
-    const idx=parseInt(cardParam,10);
-    if(!isNaN(idx)&&cards[idx]){
-      setTimeout(()=>{
-        const targetCard=document.querySelectorAll(".card")[idx];
-        if(targetCard){
-          targetCard.scrollIntoView({behavior:"smooth",block:"center"});
-          openModal(targetCard);
-        }
-      },100);
+    const cardId=cardParam.split('-')[0];
+    const targetCard=document.querySelector(`.card[data-id='${cardId}']`);
+    if(targetCard){
+      targetCard.scrollIntoView({behavior:"smooth",block:"center"});
+      openModal(targetCard);
     }
   }
 });
 </script>
 </body>
 </html>
-
-
